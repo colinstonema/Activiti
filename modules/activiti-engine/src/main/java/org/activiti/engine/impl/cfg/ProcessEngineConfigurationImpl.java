@@ -59,10 +59,12 @@ import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.RuntimeServiceImpl;
 import org.activiti.engine.impl.ServiceImpl;
 import org.activiti.engine.impl.TaskServiceImpl;
+import org.activiti.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.activiti.engine.impl.bpmn.data.ItemInstance;
 import org.activiti.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.activiti.engine.impl.bpmn.parser.BpmnParseHandlers;
 import org.activiti.engine.impl.bpmn.parser.BpmnParser;
+import org.activiti.engine.impl.bpmn.parser.factory.AbstractBehaviorFactory;
 import org.activiti.engine.impl.bpmn.parser.factory.ActivityBehaviorFactory;
 import org.activiti.engine.impl.bpmn.parser.factory.DefaultActivityBehaviorFactory;
 import org.activiti.engine.impl.bpmn.parser.factory.DefaultListenerFactory;
@@ -216,6 +218,7 @@ import org.activiti.validation.ProcessValidator;
 import org.activiti.validation.ProcessValidatorFactory;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
+import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.Configuration;
@@ -308,6 +311,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected TransactionFactory transactionFactory;
   
   protected Set<Class<?>> customMybatisMappers;
+  protected Set<String> customMybatisXMLMappers;
 
   // ID GENERATOR /////////////////////////////////////////////////////////////
   
@@ -430,7 +434,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initServices();
     initIdGenerator();
     initDeployers();
+    initJobHandlers();
     initJobExecutor();
+    initAsyncExecutor();
     initDataSource();
     initTransactionFactory();
     initSqlSessionFactory();
@@ -735,11 +741,26 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 	
 	protected Configuration parseMybatisConfiguration(Configuration configuration, XMLConfigBuilder parser) {
-	  return parser.parse();
+	  return parseCustomMybatisXMLMappers(parser.parse());
+  }
+	
+	protected Configuration parseCustomMybatisXMLMappers(Configuration configuration) {
+	  if (getCustomMybatisXMLMappers() != null)
+    // see XMLConfigBuilder.mapperElement()
+    for(String resource: getCustomMybatisXMLMappers()){
+      XMLMapperBuilder mapperParser = new XMLMapperBuilder(getResourceAsStream(resource), 
+          configuration, resource, configuration.getSqlFragments());
+      mapperParser.parse();
+    }
+    return configuration;
   }
   
+	protected InputStream getResourceAsStream(String resource) {
+    return ReflectUtil.getResourceAsStream(resource);
+  }
+	
   protected InputStream getMyBatisXmlConfigurationSteam() {
-    return ReflectUtil.getResourceAsStream(DEFAULT_MYBATIS_MAPPING_FILE);
+    return getResourceAsStream(DEFAULT_MYBATIS_MAPPING_FILE);
   }
   
   public Set<Class<?>> getCustomMybatisMappers() {
@@ -748,6 +769,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setCustomMybatisMappers(Set<Class<?>> customMybatisMappers) {
 	this.customMybatisMappers = customMybatisMappers;
+  }
+  
+  public Set<String> getCustomMybatisXMLMappers() {
+    return customMybatisXMLMappers;
+  }
+  
+  public void setCustomMybatisXMLMappers(Set<String> customMybatisXMLMappers) {
+    this.customMybatisXMLMappers = customMybatisXMLMappers;
   }
   
   // session factories ////////////////////////////////////////////////////////
@@ -939,17 +968,23 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       bpmnParseFactory = new DefaultBpmnParseFactory();
     }
     
-    if (activityBehaviorFactory == null) {
-      DefaultActivityBehaviorFactory defaultActivityBehaviorFactory = new DefaultActivityBehaviorFactory();
-      defaultActivityBehaviorFactory.setExpressionManager(expressionManager);
-      activityBehaviorFactory = defaultActivityBehaviorFactory;
-    }
-    
-    if (listenerFactory == null) {
-      DefaultListenerFactory defaultListenerFactory = new DefaultListenerFactory();
-      defaultListenerFactory.setExpressionManager(expressionManager);
-      listenerFactory = defaultListenerFactory;
-    }
+	if (activityBehaviorFactory == null) {
+	  DefaultActivityBehaviorFactory defaultActivityBehaviorFactory = new DefaultActivityBehaviorFactory();
+	  defaultActivityBehaviorFactory.setExpressionManager(expressionManager);
+	  activityBehaviorFactory = defaultActivityBehaviorFactory;
+	} else if ((activityBehaviorFactory instanceof AbstractBehaviorFactory)
+			&& ((AbstractBehaviorFactory) activityBehaviorFactory).getExpressionManager() == null) {
+		((AbstractBehaviorFactory) activityBehaviorFactory).setExpressionManager(expressionManager);
+	}
+
+	if (listenerFactory == null) {
+	  DefaultListenerFactory defaultListenerFactory = new DefaultListenerFactory();
+	  defaultListenerFactory.setExpressionManager(expressionManager);
+	  listenerFactory = defaultListenerFactory;
+	} else if ((listenerFactory instanceof AbstractBehaviorFactory)
+			&& ((AbstractBehaviorFactory) listenerFactory).getExpressionManager() == null) {
+		((AbstractBehaviorFactory) listenerFactory).setExpressionManager(expressionManager);
+	}
     
     if (bpmnParser == null) {
       bpmnParser = new BpmnParser();
@@ -1072,16 +1107,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       processDiagramGenerator = new DefaultProcessDiagramGenerator();
     }
   }
-
-  // job executor /////////////////////////////////////////////////////////////
   
-  protected void initJobExecutor() {
-    if (jobExecutor==null) {
-      jobExecutor = new DefaultJobExecutor();
-    }
-
-    jobExecutor.setClockReader(this.clock);
-
+  protected void initJobHandlers() {
     jobHandlers = new HashMap<String, JobHandler>();
     TimerExecuteNestedActivityJobHandler timerExecuteNestedActivityJobHandler = new TimerExecuteNestedActivityJobHandler();
     jobHandlers.put(timerExecuteNestedActivityJobHandler.getType(), timerExecuteNestedActivityJobHandler);
@@ -1110,18 +1137,42 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         jobHandlers.put(customJobHandler.getType(), customJobHandler);      
       }
     }
+  }
 
-    jobExecutor.setCommandExecutor(commandExecutor);
-    jobExecutor.setAutoActivate(jobExecutorActivate);
-    
-    if(jobExecutor.getRejectedJobsHandler() == null) {
-      if(customRejectedJobsHandler != null) {
-        jobExecutor.setRejectedJobsHandler(customRejectedJobsHandler);
-      } else {
-        jobExecutor.setRejectedJobsHandler(new CallerRunsRejectedJobsHandler());
+  // job executor /////////////////////////////////////////////////////////////
+  
+  protected void initJobExecutor() {
+    if (isAsyncExecutorEnabled() == false) {
+      if (jobExecutor == null) {
+        jobExecutor = new DefaultJobExecutor();
+      }
+  
+      jobExecutor.setClockReader(this.clock);
+  
+      jobExecutor.setCommandExecutor(commandExecutor);
+      jobExecutor.setAutoActivate(jobExecutorActivate);
+      
+      if (jobExecutor.getRejectedJobsHandler() == null) {
+        if(customRejectedJobsHandler != null) {
+          jobExecutor.setRejectedJobsHandler(customRejectedJobsHandler);
+        } else {
+          jobExecutor.setRejectedJobsHandler(new CallerRunsRejectedJobsHandler());
+        }
       }
     }
-    
+  }
+  
+  // async executor /////////////////////////////////////////////////////////////
+  
+  protected void initAsyncExecutor() {
+    if (isAsyncExecutorEnabled()) {
+      if (asyncExecutor == null) {
+        asyncExecutor = new DefaultAsyncJobExecutor();
+      }
+  
+      asyncExecutor.setCommandExecutor(commandExecutor);
+      asyncExecutor.setAutoActivate(asyncExecutorActivate);
+    }
   }
   
   // history //////////////////////////////////////////////////////////////////

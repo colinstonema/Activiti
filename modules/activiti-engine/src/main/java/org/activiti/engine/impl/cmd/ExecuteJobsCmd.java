@@ -23,7 +23,6 @@ import org.activiti.engine.impl.cfg.TransactionState;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
-import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.jobexecutor.FailedJobListener;
 import org.activiti.engine.impl.jobexecutor.JobExecutorContext;
 import org.activiti.engine.impl.persistence.entity.JobEntity;
@@ -33,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Tom Baeyens
+ * @author Joram Barrez
  */
 public class ExecuteJobsCmd implements Command<Object>, Serializable {
 
@@ -40,38 +40,35 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
 
   private static Logger log = LoggerFactory.getLogger(ExecuteJobsCmd.class);
   
-  protected JobEntity job;
   protected String jobId;
+  protected JobEntity job;
  
-  public ExecuteJobsCmd(JobEntity job) {
-    this.job = job;
-    if (job != null) {
-      this.jobId = job.getId();
-    }
-  }
-  
   public ExecuteJobsCmd(String jobId) {
     this.jobId = jobId;
+  }
+  
+  public ExecuteJobsCmd(JobEntity job) {
+  	this.job = job;
   }
 
   public Object execute(CommandContext commandContext) {
     
-    if (job == null && jobId == null) {
-      throw new ActivitiIllegalArgumentException("job is null");
-    }
-    
-    if (log.isDebugEnabled()) {
-      log.debug("Executing job {}", jobId);
+    if (jobId == null && job == null) {
+      throw new ActivitiIllegalArgumentException("jobId and job is null");
     }
     
     if (job == null) {
-      job = commandContext
-          .getJobEntityManager()
-          .findJobById(jobId);
+    	job = commandContext
+    	  .getJobEntityManager()
+    		.findJobById(jobId);
+    }
     
-      if (job == null) {
-        throw new JobNotFoundException(jobId);
-      }
+    if (job == null) {
+      throw new JobNotFoundException(jobId);
+    }
+    
+    if (log.isDebugEnabled()) {
+      log.debug("Executing job {}", job.getId());
     }
     
     JobExecutorContext jobExecutorContext = Context.getJobExecutorContext();
@@ -79,22 +76,24 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
       jobExecutorContext.setCurrentJob(job);
     }
     
+    FailedJobListener failedJobListener = null;
     try {
+      // When transaction is rolled back, decrement retries
+      failedJobListener = new FailedJobListener(commandContext.getProcessEngineConfiguration().getCommandExecutor(), jobId);
+      commandContext.getTransactionContext().addTransactionListener(
+              TransactionState.ROLLED_BACK,
+              failedJobListener
+              );
+
       job.execute(commandContext);
       
-      if(commandContext.getEventDispatcher().isEnabled()) {
+      if (commandContext.getEventDispatcher().isEnabled()) {
       	commandContext.getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityEvent(
       			ActivitiEventType.JOB_EXECUTION_SUCCESS, job));
       }
-    } catch (Throwable exception) {
-      // When transaction is rolled back, decrement retries
-      CommandExecutor commandExecutor = Context
-        .getProcessEngineConfiguration()
-        .getCommandExecutor();
       
-      commandContext.getTransactionContext().addTransactionListener(
-        TransactionState.ROLLED_BACK, 
-        new FailedJobListener(commandExecutor, job.getId(), exception));
+    } catch (Throwable exception) {
+      failedJobListener.setException(exception);
       
       // Dispatch an event, indicating job execution failed in a try-catch block, to prevent the original
       // exception to be swallowed
@@ -117,8 +116,8 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
     return null;
   }
   
-  public JobEntity getJob() {
-		return job;
+  public String getJobId() {
+		return jobId;
 	}
 
 }
