@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+    <appender name="file" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="File" value="/home/colin/stone/eclipse/workspace/activiti/Activiti/modules/activiti-webapp-explorer2/log/activiti.log" />
+        <param name="DatePattern" value=".yyyyMMdd" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="[%-5p %d{yyyy-MM-dd HH:mm:ss.SSS}] [%t] %l [%m]%n" />
+        </layout>
+    </appender>
+    <logger name="com.xiaomi" additivity="false">
+        <level value="debug" />
+        <appender-ref ref="file" />
+    </logger>
+        <logger name="net.paoding.rose" additivity="false">
+        <level value="debug" />
+        <appender-ref ref="file" />
+    </logger>
+    <logger name="net.sf.json" additivity="false">
+        <level value="debug" />
+        <appender-ref ref="file" />
+    </logger>
+    <logger name="org.apache.commons" additivity="false">
+        <level value="debug" />
+        <appender-ref ref="file" />
+    </logger>
+    <logger name="org.springframework" additivity="false">
+        <level value="debug" />
+        <appender-ref ref="file" />
+    </logger>
+    <logger name="org.activiti" additivity="false">
+        <level value="debug" />
+        <appender-ref ref="file" />
+    </logger>
+    <logger name="httpclient.wire" additivity="false">
+        <level value="debug" />
+        <appender-ref ref="file" />
+    </logger>
+</log4j:configuration>

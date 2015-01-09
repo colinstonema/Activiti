@@ -13,6 +13,7 @@
 package org.activiti.engine.impl.persistence.entity;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,7 +48,8 @@ public class VariableInstanceEntity implements ValueFields, PersistentObject, Ha
   protected String textValue;
   protected String textValue2;
   protected final ByteArrayRef byteArrayRef = new ByteArrayRef();
-
+  protected Collection<String> stringCollection;
+  protected Collection<Long> numberCollection;
   protected Object cachedValue;
   protected boolean forcedUpdate;
   protected boolean deleted = false;
@@ -121,6 +123,13 @@ public class VariableInstanceEntity implements ValueFields, PersistentObject, Ha
     }
     if (forcedUpdate) {
       persistentState.put("forcedUpdate", Boolean.TRUE);
+    }
+
+    if( stringCollection != null) {
+      persistentState.put("stringCollection", stringCollection);
+    }
+    if( numberCollection != null) {
+      persistentState.put("numberCollection", numberCollection);
     }
     return persistentState;
   }
@@ -287,5 +296,24 @@ public class VariableInstanceEntity implements ValueFields, PersistentObject, Ha
     sb.append("]");
     return sb.toString();
   }
-  
+
+  @Override
+  public void setStringCollectionValue(Collection<String> collectionValue) {
+    this.stringCollection = collectionValue;
+  }
+
+  @Override
+  public Collection<String> getStringCollectionValue() {
+    return this.getStringCollectionValue();
+  }
+
+  @Override
+  public void setNumberCollectionValue(Collection<Long> collectionValue) {
+    this.numberCollection = collectionValue;
+  }
+
+  @Override
+  public Collection<Long> getNumberCollectionValue() {
+    return this.numberCollection;
+  }
 }

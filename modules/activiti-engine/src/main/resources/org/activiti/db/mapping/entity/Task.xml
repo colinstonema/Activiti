@@ -485,6 +485,32 @@
           </choose>          
           #{var.textValue}
         </if>
+        <if test="var.stringCollectionValue != null">
+            <if test="var.stringCollectionValue.size() &gt; 0">
+              and A${index}.TEXT_
+              <choose>
+                  <when test="var.operator.equals('IN')">IN</when>
+                  <otherwise><include refid="executionVariableOperator" /></otherwise>
+              </choose>
+              <foreach item="stringValue" index="index" collection="var.stringCollectionValue"
+                       open="(" separator="," close=")">
+                '#{stringValue}'
+              </foreach>
+            </if>
+        </if>
+        <if test="var.numberCollectionValue != null">
+            <if test="var.numberCollectionValue.size() &gt; 0">
+              and A${index}.LONG_
+              <choose>
+                  <when test="var.operator.equals('IN')">IN</when>
+                  <otherwise><include refid="executionVariableOperator" /></otherwise>
+              </choose>
+              <foreach item="longValue" index="index" collection="var.numberCollectionValue"
+                       open="(" separator="," close=")">
+                #{longValue}
+              </foreach>
+            </if>
+        </if>
         <if test="var.textValue2 != null">
           and A${index}.TEXT2_ 
           <choose>
@@ -726,6 +752,32 @@
                 </choose>          
                 #{var.textValue}
               </if>
+              <if test="var.stringCollectionValue != null">
+                <if test="var.stringCollectionValue.size() &gt; 0">
+                 and A_OR${index}.TEXT_
+                 <choose>
+                   <when test="var.operator.equals('IN')">IN</when>
+                   <otherwise><include refid="executionVariableOperator" /></otherwise>
+                 </choose>
+                 <foreach item="stringValue" index="index" collection="var.stringCollectionValue"
+                       open="(" separator="," close=")">
+                  '#{stringValue}'
+                 </foreach>
+               </if>
+              </if>
+              <if test="var.numberCollectionValue != null">
+                <if test="var.numberCollectionValue.size() &gt; 0">
+                  and A_OR${index}.LONG_
+                  <choose>
+                    <when test="var.operator.equals('IN')">IN</when>
+                    <otherwise><include refid="executionVariableOperator" /></otherwise>
+                  </choose>
+                  <foreach item="longValue" index="index" collection="var.numberCollectionValue"
+                       open="(" separator="," close=")">
+                    #{longValue}
+                  </foreach>
+                </if>
+              </if>
               <if test="var.textValue2 != null">
                 and A_OR${index}.TEXT2_ 
                 <choose>
@@ -813,7 +865,8 @@
       <when test="var.operator.equals('GREATER_THAN')">&gt;</when>
       <when test="var.operator.equals('GREATER_THAN_OR_EQUAL')">&gt;=</when>
       <when test="var.operator.equals('LESS_THAN')">&lt;</when>
-      <when test="var.operator.equals('LESS_THAN_OR_EQUAL')">&lt;=</when>
+      <when test="var.operator.equals('IN')">IN</when>
+      <when test="var.operator.equals('NOT_IN')">NOT IN</when>
    </choose>
   </sql>  
 

@@ -7,9 +7,12 @@ import org.activiti.rest.diagram.application.DiagramServicesInit;
 import org.activiti.rest.editor.application.ModelerServicesInit;
 import org.restlet.Restlet;
 import org.restlet.routing.Router;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ExplorerRestApplication extends ActivitiRestApplication {
   
+	protected static final Logger LOGGER = LoggerFactory.getLogger(ExplorerRestApplication.class);
   public ExplorerRestApplication() {
     super();
   }
@@ -18,6 +21,7 @@ public class ExplorerRestApplication extends ActivitiRestApplication {
    */
   @Override
   public synchronized Restlet createInboundRoot() {
+	  LOGGER.error("##########################################################");
     Router router = new Router(getContext());
     router.attachDefault(DefaultResource.class);
     ModelerServicesInit.attachResources(router);

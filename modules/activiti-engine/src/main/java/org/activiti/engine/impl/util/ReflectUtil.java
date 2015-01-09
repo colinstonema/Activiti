@@ -43,6 +43,7 @@ public abstract class ReflectUtil {
   }
   
   public static Class<?> loadClass(String className) {
+	  LOG.error("@#####!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%========={}", className);
    Class<?> clazz = null;
    ClassLoader classLoader = getCustomClassLoader();
    
@@ -51,26 +52,30 @@ public abstract class ReflectUtil {
    
    if(classLoader != null) {
      try {
-       LOG.trace("Trying to load class with custom classloader: {}", className);
+       LOG.error("Trying to load class with custom classloader: {}", className);
        clazz = Class.forName(className, true, classLoader);
      } catch(Throwable t) {
        throwable = t;
      }
+   } else {
+	   LOG.error("getCustomClassLoader is null");
    }
    if(clazz == null) {
      try {
-       LOG.trace("Trying to load class with current thread context classloader: {}", className);
+       LOG.error("Trying to load class with current thread context classloader: {}", className);
        clazz = Class.forName(className, true, Thread.currentThread().getContextClassLoader());
      } catch(Throwable t) {
+    	 LOG.error("######################00000");
        if(throwable == null) {
          throwable = t;
        }
      }
      if(clazz == null) {
        try {
-         LOG.trace("Trying to load class with local classloader: {}", className);
+         LOG.error("Trying to load class with local classloader: {}", className);
          clazz = Class.forName(className, true, ReflectUtil.class.getClassLoader());
        } catch(Throwable t) {
+    	   LOG.error("######################12");
          if(throwable == null) {
            throwable = t;
          }
@@ -79,6 +84,7 @@ public abstract class ReflectUtil {
    }
   
    if(clazz == null) {
+	   LOG.error("######################1xxxxxxxxxxxxxxxxxx");
      throw new ActivitiClassLoadingException(className, throwable);
    }
    return clazz;
@@ -269,10 +275,13 @@ public abstract class ReflectUtil {
   }
   
   private static ClassLoader getCustomClassLoader() {
+	  LOG.error("getCustomClassLoader@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
     if(processEngineConfiguration != null) {
+    	LOG.error("@!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
       final ClassLoader classLoader = processEngineConfiguration.getClassLoader();
       if(classLoader != null) {
+    	  LOG.error("@!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!@@@@@@@@@@@@@@@@@@@@@@"+classLoader.getClass().getCanonicalName());
         return classLoader;
       }
     }

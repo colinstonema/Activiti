@@ -191,6 +191,7 @@ import org.activiti.engine.impl.util.IoUtil;
 import org.activiti.engine.impl.util.ReflectUtil;
 import org.activiti.engine.impl.variable.BooleanType;
 import org.activiti.engine.impl.variable.ByteArrayType;
+import org.activiti.engine.impl.variable.CollectionType;
 import org.activiti.engine.impl.variable.CustomObjectType;
 import org.activiti.engine.impl.variable.DateType;
 import org.activiti.engine.impl.variable.DefaultVariableTypes;
@@ -1159,6 +1160,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       variableTypes.addType(new UUIDType());
       variableTypes.addType(new ByteArrayType());
       variableTypes.addType(new SerializableType());
+      variableTypes.addType(new CollectionType());
       variableTypes.addType(new CustomObjectType("item", ItemInstance.class));
       variableTypes.addType(new CustomObjectType("message", MessageInstance.class));
       if (customPostVariableTypes!=null) {

@@ -29,4 +29,6 @@ public enum QueryOperator {
   LIKE,
   EQUALS_IGNORE_CASE,
   NOT_EQUALS_IGNORE_CASE,
+  IN,
+  NOT_IN,
 }

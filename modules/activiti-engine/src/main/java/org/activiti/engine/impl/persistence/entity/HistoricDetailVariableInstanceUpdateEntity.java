@@ -13,6 +13,8 @@
 
 package org.activiti.engine.impl.persistence.entity;
 
+import java.util.Collection;
+
 import org.activiti.engine.history.HistoricVariableUpdate;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.db.HasRevision;
@@ -38,7 +40,8 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricDetailEn
   protected String textValue;
   protected String textValue2;
   protected final ByteArrayRef byteArrayRef = new ByteArrayRef();
-
+  protected Collection<String> stringCollection;
+  protected Collection<Long> numberCollection;
   protected Object cachedValue;
 
   protected HistoricDetailVariableInstanceUpdateEntity() {
@@ -57,7 +60,8 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricDetailEn
     historicVariableUpdate.textValue2 = variableInstance.getTextValue2();
     historicVariableUpdate.doubleValue = variableInstance.getDoubleValue();
     historicVariableUpdate.longValue = variableInstance.getLongValue();
-
+    historicVariableUpdate.stringCollection = variableInstance.getStringCollectionValue();
+    historicVariableUpdate.numberCollection = variableInstance.getNumberCollectionValue();
     if (variableInstance.getBytes() != null) {
       String byteArrayName = "hist.detail.var-" + variableInstance.getName();
       historicVariableUpdate.byteArrayRef.setValue(byteArrayName, variableInstance.getBytes());
@@ -206,7 +210,27 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricDetailEn
       sb.append(", byteArrayValueId=").append(byteArrayRef.getId());
     }
     sb.append("]");
+    //TODO
     return sb.toString();
   }
-  
+
+  @Override
+  public void setStringCollectionValue(Collection<String> collectionValue) {
+    this.stringCollection = collectionValue;
+  }
+
+  @Override
+  public Collection<String> getStringCollectionValue() {
+    return this.getStringCollectionValue();
+  }
+
+  @Override
+  public void setNumberCollectionValue(Collection<Long> collectionValue) {
+    this.numberCollection = collectionValue;
+  }
+
+  @Override
+  public Collection<Long> getNumberCollectionValue() {
+    return this.numberCollection;
+  }
 }

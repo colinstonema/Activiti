@@ -21,13 +21,14 @@
     </activiti.artifact>
   </properties>
 
+<!--
   <repositories>
     <repository>
       <id>vaadin-addons</id>
       <url>http://maven.vaadin.com/vaadin-addons</url>
     </repository>
   </repositories>
-
+-->
   <build>
     <plugins>
       <plugin>
@@ -205,12 +206,25 @@
     <!-- Must be defined both in activiti-explorer and activiti-webapp-explorer, 
       as otherwise the gwt compiler won't find it -->
     <dependency>
+      <groupId>org.dussan.vaadin</groupId>
+      <artifactId>dcharts</artifactId>
+      <version>0.10.0</version>
+      <scope>compile</scope>
+    </dependency>
+<!--
+    <dependency>
       <groupId>org.vaadin.addons</groupId>
       <artifactId>dcharts-widget</artifactId>
       <version>0.10.0</version>
       <scope>compile</scope>
     </dependency>
-
+-->
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <scope>runtime</scope>
+      <version>5.1.24</version>
+    </dependency>
   </dependencies>
 
   <profiles>

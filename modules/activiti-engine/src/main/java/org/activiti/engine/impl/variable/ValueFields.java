@@ -13,6 +13,8 @@
 
 package org.activiti.engine.impl.variable;
 
+import java.util.Collection;
+
 import org.activiti.engine.impl.persistence.entity.ByteArrayEntity;
 
 
@@ -100,5 +102,11 @@ public interface ValueFields {
   
   Object getCachedValue();
   void setCachedValue(Object cachedValue);
+  
+  void setStringCollectionValue(Collection<String> collectionValue);
+  Collection<String> getStringCollectionValue();
+
+  void setNumberCollectionValue(Collection<Long> collectionValue);
+  Collection<Long> getNumberCollectionValue();
 
 }

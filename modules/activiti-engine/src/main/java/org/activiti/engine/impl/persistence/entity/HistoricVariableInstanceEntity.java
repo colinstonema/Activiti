@@ -14,6 +14,7 @@
 package org.activiti.engine.impl.persistence.entity;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -52,7 +53,8 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   protected String textValue;
   protected String textValue2;
   protected final ByteArrayRef byteArrayRef = new ByteArrayRef();
-
+  protected Collection<String> stringCollection;
+  protected Collection<Long> numberCollection;
   protected Object cachedValue;
 
   // Default constructor for SQL mapping
@@ -92,7 +94,8 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     if (variableInstance.getByteArrayValueId()!=null) {
       setByteArrayValue(variableInstance.getByteArrayValue().getBytes());
     }
-    
+    this.stringCollection = variableInstance.getStringCollectionValue();
+    this.numberCollection = variableInstance.getNumberCollectionValue();
     this.lastUpdatedTime = Context.getProcessEngineConfiguration().getClock().getCurrentTime();
   }
 
@@ -113,7 +116,9 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   	persistentState.put("doubleValue", doubleValue);
   	persistentState.put("longValue", longValue);
   	persistentState.put("byteArrayRef", byteArrayRef.getId());
-  	
+    persistentState.put("stringCollection", stringCollection);
+    persistentState.put("numberCollection", numberCollection);
+
   	persistentState.put("createTime", createTime);
   	persistentState.put("lastUpdatedTime", lastUpdatedTime);
   	
@@ -308,5 +313,24 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     sb.append("]");
     return sb.toString();
   }
-  
+
+  @Override
+  public void setStringCollectionValue(Collection<String> collectionValue) {
+    this.stringCollection = collectionValue;
+  }
+
+  @Override
+  public Collection<String> getStringCollectionValue() {
+    return this.getStringCollectionValue();
+  }
+
+  @Override
+  public void setNumberCollectionValue(Collection<Long> collectionValue) {
+    this.numberCollection = collectionValue;
+  }
+
+  @Override
+  public Collection<Long> getNumberCollectionValue() {
+    return this.numberCollection;
+  }
 }

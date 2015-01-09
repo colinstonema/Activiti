@@ -14,6 +14,7 @@
 package org.activiti.engine.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.activiti.engine.ActivitiIllegalArgumentException;
@@ -157,7 +158,27 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?,?>, U> extends
     addVariable(name, value, QueryOperator.LIKE, localScope);
     return (T)this;
   }
-  
+
+  public T variableValueIn(String name, Collection values) {
+    return variableValueIn(name, values, true);
+  }
+
+  @SuppressWarnings("unchecked")
+  public T variableValueIn(String name, Collection values, boolean localScope) {
+    addVariable(name, values, QueryOperator.IN, localScope);
+    return (T)this;
+  }
+
+  public T variableValueNotIn(String name, Collection values) {
+    return variableValueNotIn(name, values, true);
+  }
+
+  @SuppressWarnings("unchecked")
+  public T variableValueNotIn(String name, Collection values, boolean localScope) {
+    addVariable(name, values, QueryOperator.NOT_IN, localScope);
+    return (T)this;
+  }
+
   private void addVariable(String name, Object value, QueryOperator operator, boolean localScope) {
     if(name == null) {
       throw new ActivitiIllegalArgumentException("name is null");

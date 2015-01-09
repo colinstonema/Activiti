@@ -13,6 +13,7 @@
 package org.activiti.engine.task;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -253,7 +254,9 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    *          wildcard character '%' to express like-strategy: starts with
    *          (string%), ends with (%string) or contains (%string%). */
   TaskQuery taskVariableValueLike(String name, String value);
-  
+
+  TaskQuery taskVariableValueIn(String name, Collection values);
+  TaskQuery taskVariableValueNotIn(String name, Collection values);
   /**
    * Only select tasks which are part of a process that has a variable
    * with the given name set to the given value.
@@ -335,7 +338,10 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    *          wildcard character '%' to express like-strategy: starts with
    *          (string%), ends with (%string) or contains (%string%). */
   TaskQuery processVariableValueLike(String name, String value);
-  
+
+  TaskQuery processVariableValueIn(String name, Collection values);
+  TaskQuery processVariableValueNotIn(String name, Collection values);
+
   /**
    * Only select tasks which are part of a process instance which has the given
    * process definition key.

@@ -13,6 +13,7 @@
 package org.activiti.engine.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -585,6 +586,16 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     return this;
   }
 
+  @Override
+  public TaskQuery taskVariableValueIn(String name, Collection values) {
+    return null;
+  }
+
+  @Override
+  public TaskQuery taskVariableValueNotIn(String name, Collection values) {
+    return null;
+  }
+
   public TaskQuery processVariableValueEquals(String variableName, Object variableValue) {
     if(orActive) {
       orQueryObject.variableValueEquals(variableName, variableValue, false);
@@ -673,6 +684,19 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
       this.variableValueLike(name, value, false);
     }
     return this;
+  }
+
+  @Override
+  public TaskQuery processVariableValueIn(String name, Collection values) {
+    if(orActive) {
+      
+    }
+    return null;
+  }
+
+  @Override
+  public TaskQuery processVariableValueNotIn(String name, Collection values) {
+    return null;
   }
 
   public TaskQuery processDefinitionKey(String processDefinitionKey) {
@@ -1121,5 +1145,5 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
   public boolean isOrActive() {
     return orActive;
   }
-  
+
 }
