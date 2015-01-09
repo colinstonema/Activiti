@@ -14,6 +14,7 @@
 package org.activiti.engine.impl;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
@@ -106,5 +107,19 @@ public class QueryVariableValue implements Serializable {
   
   public boolean isLocal() {
     return local;
+  }
+
+  public Collection<String> getStringCollectionValue() {
+    if(variableInstanceEntity != null) {
+      return variableInstanceEntity.getStringCollectionValue();
+    }
+    return null;
+  }
+
+  public Collection<Long> getNumberCollectionValue() {
+    if(variableInstanceEntity != null) {
+      return variableInstanceEntity.getNumberCollectionValue();
+    }
+    return null;
   }
 }

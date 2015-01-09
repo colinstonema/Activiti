@@ -588,12 +588,22 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
   @Override
   public TaskQuery taskVariableValueIn(String name, Collection values) {
-    return null;
+    if(orActive) {
+      orQueryObject.variableValueIn(name, values);
+    } else {
+      this.variableValueIn(name, values);
+    }
+    return this;
   }
 
   @Override
   public TaskQuery taskVariableValueNotIn(String name, Collection values) {
-    return null;
+    if(orActive) {
+      orQueryObject.variableValueNotIn(name, values);
+    } else {
+      this.variableValueNotIn(name, values);
+    }
+    return this;
   }
 
   public TaskQuery processVariableValueEquals(String variableName, Object variableValue) {
@@ -689,14 +699,21 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
   @Override
   public TaskQuery processVariableValueIn(String name, Collection values) {
     if(orActive) {
-      
+      orQueryObject.variableValueIn(name, values, false);
+    } else {
+      this.variableValueIn(name, values, false);
     }
-    return null;
+    return this;
   }
 
   @Override
   public TaskQuery processVariableValueNotIn(String name, Collection values) {
-    return null;
+    if(orActive) {
+      orQueryObject.variableValueNotIn(name, values, false);
+    } else {
+      this.variableValueNotIn(name, values, false);
+    }
+    return this;
   }
 
   public TaskQuery processDefinitionKey(String processDefinitionKey) {

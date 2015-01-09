@@ -14,10 +14,6 @@ package org.activiti.engine.impl.variable;
 
 import java.util.Collection;
 
-import org.apache.commons.lang3.StringUtils;
-
-
-
 /**
  * 
  * @author colin
@@ -26,7 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 public class CollectionType implements VariableType {
 
   public String getTypeName() {
-    return "collection";
+    return "null";
   }
 
   public boolean isCachable() {
@@ -34,45 +30,29 @@ public class CollectionType implements VariableType {
   }
 
   public Object getValue(ValueFields valueFields) {
-    return valueFields.getTextValue();
+    return valueFields.getNumberCollectionValue() == null ? valueFields.getStringCollectionValue() : valueFields.getNumberCollectionValue();
   }
 
   public void setValue(Object value, ValueFields valueFields) {
+    if(value == null) {
+      return;
+    }
     if(!(value instanceof Collection)) {
       return;
     }
     Collection collection = (Collection) value;
-    String separator = null;
-    if(collection.size() != 0) {
-      Object obj = collection.iterator().next();
-      if (obj instanceof Number) {
-        separator = ",";
-      } else {
-        separator = "','";
-      }
+    if(collection.isEmpty()) {
+      return;
     }
-    String textValue = StringUtils.join(collection, separator);
-    valueFields.setTextValue(textValue);
+    Object obj = collection.iterator().next();
+    if(String.class.isAssignableFrom(obj.getClass())) {
+      valueFields.setStringCollectionValue(collection);
+    } else if(Number.class.isAssignableFrom(obj.getClass())) {
+      valueFields.setNumberCollectionValue(collection);
+    }
   }
 
   public boolean isAbleToStore(Object value) {
-    if (value==null) {
-      return true;
-    }
-    if(Collection.class.isAssignableFrom(value.getClass())) {
-      Collection collection = (Collection) value;
-      if(collection.isEmpty()) {
-        return true;
-      }
-      Object obj = collection.iterator().next();
-      if(String.class.isAssignableFrom(obj.getClass())) {
-        return true;
-      } else if(Number.class.isAssignableFrom(obj.getClass())) {
-        return true;
-      } else {
-        return false;
-      }
-    }
     return false;
   }
 }

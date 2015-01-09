@@ -210,6 +210,12 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?,?>, U> extends
       {
         throw new ActivitiIllegalArgumentException("Only string values can be used with 'like' condition");
       }
+      if(operator == QueryOperator.IN && !(value instanceof Collection)) {
+        throw new ActivitiIllegalArgumentException("Only Collection values can be used with 'in' condition");
+      }
+      if(operator == QueryOperator.NOT_IN && !(value instanceof Collection)) {
+        throw new ActivitiIllegalArgumentException("Only Collection values can be used with 'not in' condition");
+      }
     }
     queryVariableValues.add(new QueryVariableValue(name, value, operator, localScope));
   }
