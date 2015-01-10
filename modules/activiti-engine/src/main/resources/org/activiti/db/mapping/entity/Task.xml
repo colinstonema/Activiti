@@ -466,7 +466,7 @@
           <!-- Match-all variable-names when name is null -->
           and A${index}.NAME_= #{var.name}
         </if>
-        <if test="!var.type.equals('null')">
+        <if test="!var.type.equals('null') &amp;&amp; !var.type.equals('collection')">
           and A${index}.TYPE_ = #{var.type}
         </if>
         <!-- Variable value -->
@@ -482,10 +482,10 @@
           <choose>
               <when test="var.operator.equals('LIKE')">LIKE</when>
               <otherwise><include refid="executionVariableOperator" /></otherwise>
-          </choose>          
+          </choose>
           #{var.textValue}
         </if>
-        <if test="var.stringCollectionValue != null &amp;&amp; var.stringCollectionValue.size() &gt; 0">
+        <if test="var.stringCollectionValue != null &amp;&amp; var.stringCollectionValue.size() &gt; 0 &amp;&amp; var.textValue == null &amp;&amp; var.longValue == null &amp;&amp; var.doubleValue == null">
           and A${index}.TEXT_
           <choose>
             <when test="var.operator.equals('IN')">IN</when>
@@ -496,15 +496,26 @@
             #{stringValue}
           </foreach>
         </if>
-        <if test="var.numberCollectionValue != null &amp;&amp; var.numberCollectionValue.size() &gt; 0">
+        <if test="var.longCollectionValue != null &amp;&amp; var.longCollectionValue.size() &gt; 0 &amp;&amp; var.textValue == null &amp;&amp; var.longValue == null &amp;&amp; var.doubleValue == null">
           and A${index}.LONG_
           <choose>
             <when test="var.operator.equals('IN')">IN</when>
             <otherwise><include refid="executionVariableOperator" /></otherwise>
           </choose>
-          <foreach item="longValue" index="index" collection="var.numberCollectionValue"
+          <foreach item="longValue" index="index" collection="var.longCollectionValue"
                open="(" separator="," close=")">
              #{longValue}
+          </foreach>
+        </if>
+        <if test="var.doubleCollectionValue != null &amp;&amp; var.doubleCollectionValue.size() &gt; 0 &amp;&amp; var.textValue == null &amp;&amp; var.longValue == null &amp;&amp; var.doubleValue == null">
+          and A${index}.DOUBLE_ 
+          <choose>
+            <when test="var.operator.equals('IN')">IN</when>
+            <otherwise><include refid="executionVariableOperator" /></otherwise>
+          </choose>
+          <foreach item="doubleValue" index="index" collection="var.doubleCollectionValue"
+               open="(" separator="," close=")">
+             #{doubleValue}
           </foreach>
         </if>
         <if test="var.textValue2 != null">
@@ -526,7 +537,7 @@
           #{var.doubleValue}
         </if>
         <!-- Null variable type -->
-        <if test="var.textValue == null &amp;&amp; var.textValue2 == null &amp;&amp; var.longValue == null &amp;&amp; var.doubleValue == null">
+        <if test="var.textValue == null &amp;&amp; var.textValue2 == null &amp;&amp; var.longValue == null &amp;&amp; var.doubleValue == null &amp;&amp; (var.stringCollectionValue == null || var.stringCollectionValue.size() == 0) &amp;&amp; (var.longCollectionValue == null || var.longCollectionValue.size() == 0) &amp;&amp; (var.doubleCollectionValue == null || var.doubleCollectionValue.size() == 0) ">
           <choose>
             <when test="var.operator.equals('NOT_EQUALS')">
               and (A${index}.TEXT_ is not null or A${index}.TEXT2_ is not null or A${index}.LONG_ is not null or A${index}.DOUBLE_ is not null or A${index}.BYTEARRAY_ID_ is not null)
@@ -729,7 +740,7 @@
                 <!-- Match-all variable-names when name is null -->
                 and A_OR${index}.NAME_= #{var.name}
               </if>
-              <if test="!var.type.equals('null')">
+              <if test="!var.type.equals('null') &amp;&amp; !var.type.equals('collection')">
                 and A_OR${index}.TYPE_ = #{var.type}
               </if>
               <!-- Variable value -->
@@ -748,7 +759,7 @@
                 </choose>          
                 #{var.textValue}
               </if>
-              <if test="var.stringCollectionValue != null &amp;&amp; var.stringCollectionValue.size() &gt; 0">
+              <if test="var.stringCollectionValue != null &amp;&amp; var.stringCollectionValue.size() &gt; 0 &amp;&amp; var.textValue == null &amp;&amp; var.longValue == null &amp;&amp; var.doubleValue == null">
                 and A_OR${index}.TEXT_
                 <choose>
                   <when test="var.operator.equals('IN')">IN</when>
@@ -759,15 +770,26 @@
                    #{stringValue}
                 </foreach>
               </if>
-              <if test="var.numberCollectionValue != null && var.numberCollectionValue.size() &gt; 0">
+              <if test="var.longCollectionValue != null &amp;&amp; var.longCollectionValue.size() &gt; 0 &amp;&amp; var.textValue == null &amp;&amp; var.longValue == null &amp;&amp; var.doubleValue == null">
                 and A_OR${index}.LONG_
                 <choose>
                   <when test="var.operator.equals('IN')">IN</when>
                   <otherwise><include refid="executionVariableOperator" /></otherwise>
                 </choose>
-                <foreach item="longValue" index="index" collection="var.numberCollectionValue"
+                <foreach item="longValue" index="index" collection="var.longCollectionValue"
                      open="(" separator="," close=")">
                   #{longValue}
+                </foreach>
+              </if>
+              <if test="var.doubleCollectionValue != null &amp;&amp; var.doubleCollectionValue.size() &gt; 0 &amp;&amp; var.textValue == null &amp;&amp; var.longValue == null &amp;&amp; var.doubleValue == null">
+                and A_OR${index}.DOUBLE_
+                <choose>
+                  <when test="var.operator.equals('IN')">IN</when>
+                  <otherwise><include refid="executionVariableOperator" /></otherwise>
+                </choose>
+                <foreach item="doubleValue" index="index" collection="var.doubleCollectionValue"
+                     open="(" separator="," close=")">
+                  #{doubleValue}
                 </foreach>
               </if>
               <if test="var.textValue2 != null">
@@ -775,7 +797,7 @@
                 <choose>
                   <when test="var.operator.equals('LIKE')">LIKE</when>
                   <otherwise><include refid="executionVariableOperator" /></otherwise>
-                </choose>          
+                </choose>
                 #{var.textValue2}
               </if>
               <if test="var.longValue != null">
@@ -789,7 +811,7 @@
                 #{var.doubleValue}
               </if>
               <!-- Null variable type -->
-              <if test="var.textValue == null &amp;&amp; var.textValue2 == null &amp;&amp; var.longValue == null &amp;&amp; var.doubleValue == null">
+              <if test="var.textValue == null &amp;&amp; var.textValue2 == null &amp;&amp; var.longValue == null &amp;&amp; var.doubleValue == null &amp;&amp; (var.stringCollectionValue == null || var.stringCollectionValue.size() == 0) &amp;&amp; (var.longCollectionValue == null || var.longCollectionValue.size() == 0) &amp;&amp; (var.doubleCollectionValue == null || var.doubleCollectionValue.size() == 0)">
                 <choose>
                   <when test="var.operator.equals('NOT_EQUALS')">
                     and (A_OR${index}.TEXT_ is not null or A_OR${index}.TEXT2_ is not null or A_OR${index}.LONG_ is not null or A_OR${index}.DOUBLE_ is not null or A_OR${index}.BYTEARRAY_ID_ is not null)

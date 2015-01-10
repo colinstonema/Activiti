@@ -14,6 +14,8 @@ package org.activiti.engine.impl.variable;
 
 import java.util.Collection;
 
+import org.activiti.engine.impl.util.CollectionUtil;
+
 /**
  * 
  * @author colin
@@ -22,7 +24,7 @@ import java.util.Collection;
 public class CollectionType implements VariableType {
 
   public String getTypeName() {
-    return "null";
+    return "collection";
   }
 
   public boolean isCachable() {
@@ -30,7 +32,16 @@ public class CollectionType implements VariableType {
   }
 
   public Object getValue(ValueFields valueFields) {
-    return valueFields.getNumberCollectionValue() == null ? valueFields.getStringCollectionValue() : valueFields.getNumberCollectionValue();
+    if(valueFields.getLongCollectionValue() != null) {
+      return valueFields.getLongCollectionValue();
+    }
+    if(valueFields.getStringCollectionValue() != null) {
+      return valueFields.getStringCollectionValue();
+    }
+    if(valueFields.getDoubleCollectionValue() != null) {
+      return valueFields.getDoubleCollectionValue();
+    }
+    return null;
   }
 
   public void setValue(Object value, ValueFields valueFields) {
@@ -44,15 +55,43 @@ public class CollectionType implements VariableType {
     if(collection.isEmpty()) {
       return;
     }
-    Object obj = collection.iterator().next();
-    if(String.class.isAssignableFrom(obj.getClass())) {
+
+    Class clazz = CollectionUtil.getContentClass(collection);
+    if(clazz == null) {
+      return;
+    }
+    if(String.class.isAssignableFrom(clazz)) {
       valueFields.setStringCollectionValue(collection);
-    } else if(Number.class.isAssignableFrom(obj.getClass())) {
-      valueFields.setNumberCollectionValue(collection);
+    } else if(Integer.class.isAssignableFrom(clazz) || int.class.isAssignableFrom(clazz)
+        || Long.class.isAssignableFrom(clazz) || long.class.isAssignableFrom(clazz)
+        || Short.class.isAssignableFrom(clazz)|| short.class.isAssignableFrom(clazz)
+        || Byte.class.isAssignableFrom(clazz) || byte.class.isAssignableFrom(clazz)) {
+      valueFields.setLongCollectionValue(collection);
+    } else if(Double.class.isAssignableFrom(clazz) || double.class.isAssignableFrom(clazz)) {
+      valueFields.setDoubleCollectionValue(collection);
     }
   }
 
   public boolean isAbleToStore(Object value) {
+    if (value == null) {
+      return true;
+    }
+    if(!Collection.class.isAssignableFrom(value.getClass())) {
+      return false;
+    }
+    Collection collection = (Collection)value;
+    Class clazz = CollectionUtil.getContentClass(collection);
+    if(clazz == null) {
+      return true;
+    }
+    if(String.class.isAssignableFrom(clazz)
+        || Integer.class.isAssignableFrom(clazz) || int.class.isAssignableFrom(clazz)
+        || Long.class.isAssignableFrom(clazz) || long.class.isAssignableFrom(clazz)
+        || Short.class.isAssignableFrom(clazz)|| short.class.isAssignableFrom(clazz)
+        || Byte.class.isAssignableFrom(clazz) || byte.class.isAssignableFrom(clazz)
+        || Double.class.isAssignableFrom(clazz) || double.class.isAssignableFrom(clazz)) {
+      return true;
+    }
     return false;
   }
 }

@@ -40,8 +40,9 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricDetailEn
   protected String textValue;
   protected String textValue2;
   protected final ByteArrayRef byteArrayRef = new ByteArrayRef();
-  protected Collection<String> stringCollection;
-  protected Collection<Long> numberCollection;
+  protected Collection<String> stringCollectionValue;
+  protected Collection<Long> longCollectionValue;
+  protected Collection<Double> doubleCollectionValue;
   protected Object cachedValue;
 
   protected HistoricDetailVariableInstanceUpdateEntity() {
@@ -60,8 +61,9 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricDetailEn
     historicVariableUpdate.textValue2 = variableInstance.getTextValue2();
     historicVariableUpdate.doubleValue = variableInstance.getDoubleValue();
     historicVariableUpdate.longValue = variableInstance.getLongValue();
-    historicVariableUpdate.stringCollection = variableInstance.getStringCollectionValue();
-    historicVariableUpdate.numberCollection = variableInstance.getNumberCollectionValue();
+    historicVariableUpdate.stringCollectionValue = variableInstance.getStringCollectionValue();
+    historicVariableUpdate.longCollectionValue = variableInstance.getLongCollectionValue();
+    historicVariableUpdate.doubleCollectionValue = variableInstance.getDoubleCollectionValue();
     if (variableInstance.getBytes() != null) {
       String byteArrayName = "hist.detail.var-" + variableInstance.getName();
       historicVariableUpdate.byteArrayRef.setValue(byteArrayName, variableInstance.getBytes());
@@ -209,28 +211,46 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricDetailEn
     if (byteArrayRef.getId() != null) {
       sb.append(", byteArrayValueId=").append(byteArrayRef.getId());
     }
+    if (stringCollectionValue != null) {
+      sb.append(", stringCollectionValue=").append(stringCollectionValue);
+    }
+    if (longCollectionValue != null) {
+      sb.append(", longCollectionValue=").append(longCollectionValue);
+    }
+    if (doubleCollectionValue != null) {
+      sb.append(", doubleCollectionValue=").append(doubleCollectionValue);
+    }
     sb.append("]");
-    //TODO
     return sb.toString();
   }
 
   @Override
-  public void setStringCollectionValue(Collection<String> collectionValue) {
-    this.stringCollection = collectionValue;
+  public void setStringCollectionValue(Collection<String> stringCollectionValue) {
+    this.stringCollectionValue = stringCollectionValue;
   }
 
   @Override
   public Collection<String> getStringCollectionValue() {
-    return this.getStringCollectionValue();
+    return this.stringCollectionValue;
   }
 
   @Override
-  public void setNumberCollectionValue(Collection<Long> collectionValue) {
-    this.numberCollection = collectionValue;
+  public void setLongCollectionValue(Collection<Long> longCollectionValue) {
+    this.longCollectionValue = longCollectionValue;
   }
 
   @Override
-  public Collection<Long> getNumberCollectionValue() {
-    return this.numberCollection;
+  public Collection<Long> getLongCollectionValue() {
+    return this.longCollectionValue;
+  }
+
+  @Override
+  public void setDoubleCollectionValue(Collection<Double> doubleCollectionValue) {
+    this.doubleCollectionValue = doubleCollectionValue;
+  }
+
+  @Override
+  public Collection<Double> getDoubleCollectionValue() {
+    return this.doubleCollectionValue;
   }
 }

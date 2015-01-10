@@ -103,10 +103,13 @@ public interface ValueFields {
   Object getCachedValue();
   void setCachedValue(Object cachedValue);
   
-  void setStringCollectionValue(Collection<String> collectionValue);
+  void setStringCollectionValue(Collection<String> stringCollectionValue);
   Collection<String> getStringCollectionValue();
 
-  void setNumberCollectionValue(Collection<Long> collectionValue);
-  Collection<Long> getNumberCollectionValue();
+  void setLongCollectionValue(Collection<Long> longCollectionValue);
+  Collection<Long> getLongCollectionValue();
+
+  void setDoubleCollectionValue(Collection<Double> doubleCollectionValue);
+  Collection<Double> getDoubleCollectionValue();
 
 }

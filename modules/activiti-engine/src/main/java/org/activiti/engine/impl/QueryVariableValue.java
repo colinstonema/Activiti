@@ -110,16 +110,14 @@ public class QueryVariableValue implements Serializable {
   }
 
   public Collection<String> getStringCollectionValue() {
-    if(variableInstanceEntity != null) {
-      return variableInstanceEntity.getStringCollectionValue();
-    }
-    return null;
+    return this.variableInstanceEntity.getStringCollectionValue();
   }
 
-  public Collection<Long> getNumberCollectionValue() {
-    if(variableInstanceEntity != null) {
-      return variableInstanceEntity.getNumberCollectionValue();
-    }
-    return null;
+  public Collection<Long> getLongCollectionValue() {
+    return this.variableInstanceEntity.getLongCollectionValue();
+  }
+
+  public Collection<Double> getDoubleCollectionValue() {
+    return this.variableInstanceEntity.getDoubleCollectionValue();
   }
 }

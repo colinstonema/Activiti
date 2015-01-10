@@ -53,8 +53,9 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   protected String textValue;
   protected String textValue2;
   protected final ByteArrayRef byteArrayRef = new ByteArrayRef();
-  protected Collection<String> stringCollection;
-  protected Collection<Long> numberCollection;
+  protected Collection<String> stringCollectionValue;
+  protected Collection<Long> longCollectionValue;
+  protected Collection<Double> doubleCollectionValue;
   protected Object cachedValue;
 
   // Default constructor for SQL mapping
@@ -94,8 +95,9 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     if (variableInstance.getByteArrayValueId()!=null) {
       setByteArrayValue(variableInstance.getByteArrayValue().getBytes());
     }
-    this.stringCollection = variableInstance.getStringCollectionValue();
-    this.numberCollection = variableInstance.getNumberCollectionValue();
+    this.stringCollectionValue = variableInstance.getStringCollectionValue();
+    this.longCollectionValue = variableInstance.getLongCollectionValue();
+    this.doubleCollectionValue = variableInstance.getDoubleCollectionValue();
     this.lastUpdatedTime = Context.getProcessEngineConfiguration().getClock().getCurrentTime();
   }
 
@@ -116,8 +118,9 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   	persistentState.put("doubleValue", doubleValue);
   	persistentState.put("longValue", longValue);
   	persistentState.put("byteArrayRef", byteArrayRef.getId());
-    persistentState.put("stringCollection", stringCollection);
-    persistentState.put("numberCollection", numberCollection);
+    persistentState.put("stringCollectionValue", stringCollectionValue);
+    persistentState.put("longCollectionValue", longCollectionValue);
+    persistentState.put("doubleCollectionValue", doubleCollectionValue);
 
   	persistentState.put("createTime", createTime);
   	persistentState.put("lastUpdatedTime", lastUpdatedTime);
@@ -310,27 +313,46 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     if (byteArrayRef.getId() != null) {
       sb.append(", byteArrayValueId=").append(byteArrayRef.getId());
     }
+    if (stringCollectionValue != null) {
+      sb.append(", stringCollectionValue=").append(stringCollectionValue);
+    }
+    if (longCollectionValue != null) {
+      sb.append(", longCollectionValue=").append(longCollectionValue);
+    }
+    if (doubleCollectionValue != null) {
+      sb.append(", doubleCollectionValue=").append(doubleCollectionValue);
+    }
     sb.append("]");
     return sb.toString();
   }
 
   @Override
-  public void setStringCollectionValue(Collection<String> collectionValue) {
-    this.stringCollection = collectionValue;
+  public void setStringCollectionValue(Collection<String> stringCollectionValue) {
+    this.stringCollectionValue = stringCollectionValue;
   }
 
   @Override
   public Collection<String> getStringCollectionValue() {
-    return this.getStringCollectionValue();
+    return this.stringCollectionValue;
   }
 
   @Override
-  public void setNumberCollectionValue(Collection<Long> collectionValue) {
-    this.numberCollection = collectionValue;
+  public void setLongCollectionValue(Collection<Long> longCollectionValue) {
+    this.longCollectionValue = longCollectionValue;
   }
 
   @Override
-  public Collection<Long> getNumberCollectionValue() {
-    return this.numberCollection;
+  public Collection<Long> getLongCollectionValue() {
+    return this.longCollectionValue;
+  }
+
+  @Override
+  public void setDoubleCollectionValue(Collection<Double> doubleCollectionValue) {
+    this.doubleCollectionValue = doubleCollectionValue;
+  }
+
+  @Override
+  public Collection<Double> getDoubleCollectionValue() {
+    return this.doubleCollectionValue;
   }
 }

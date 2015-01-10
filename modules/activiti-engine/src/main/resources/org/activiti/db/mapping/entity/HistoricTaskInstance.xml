@@ -462,7 +462,7 @@
           <!-- Match-all variable-names when name is null -->
           and A${index}.NAME_= #{queryVar.name}
         </if>
-        <if test="!queryVar.type.equals('null')">
+        <if test="!queryVar.type.equals('null') &amp;&amp; !queryVar.type.equals('collection')">
           and A${index}.VAR_TYPE_ = #{queryVar.type}
         </if>
         <!-- Variable value -->
@@ -687,7 +687,7 @@
                 <!-- Match-all variable-names when name is null -->
                 and A_OR${index}.NAME_= #{queryVar.name}
               </if>
-              <if test="!queryVar.type.equals('null')">
+              <if test="!queryVar.type.equals('null') &amp;&amp; !queryVar.type.equals('collection')">
                 and A_OR${index}.VAR_TYPE_ = #{queryVar.type}
               </if>
               <!-- Variable value -->

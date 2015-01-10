@@ -48,8 +48,9 @@ public class VariableInstanceEntity implements ValueFields, PersistentObject, Ha
   protected String textValue;
   protected String textValue2;
   protected final ByteArrayRef byteArrayRef = new ByteArrayRef();
-  protected Collection<String> stringCollection;
-  protected Collection<Long> numberCollection;
+  protected Collection<String> stringCollectionValue;
+  protected Collection<Long> longCollectionValue;
+  protected Collection<Double> doubleCollectionValue;
   protected Object cachedValue;
   protected boolean forcedUpdate;
   protected boolean deleted = false;
@@ -125,11 +126,14 @@ public class VariableInstanceEntity implements ValueFields, PersistentObject, Ha
       persistentState.put("forcedUpdate", Boolean.TRUE);
     }
 
-    if( stringCollection != null) {
-      persistentState.put("stringCollection", stringCollection);
+    if(stringCollectionValue != null) {
+      persistentState.put("stringCollectionValue", stringCollectionValue);
     }
-    if( numberCollection != null) {
-      persistentState.put("numberCollection", numberCollection);
+    if(longCollectionValue != null) {
+      persistentState.put("longCollectionValue", longCollectionValue);
+    }
+    if(this.doubleCollectionValue != null) {
+      persistentState.put("doubleCollectionValue", doubleCollectionValue);
     }
     return persistentState;
   }
@@ -293,27 +297,46 @@ public class VariableInstanceEntity implements ValueFields, PersistentObject, Ha
     if (byteArrayRef.getId() != null) {
       sb.append(", byteArrayValueId=").append(byteArrayRef.getId());
     }
+    if (stringCollectionValue != null) {
+      sb.append(", stringCollectionValue=").append(stringCollectionValue);
+    }
+    if (longCollectionValue != null) {
+      sb.append(", longCollectionValue=").append(longCollectionValue);
+    }
+    if (doubleCollectionValue != null) {
+      sb.append(", doubleCollectionValue=").append(doubleCollectionValue);
+    }
     sb.append("]");
     return sb.toString();
   }
 
   @Override
-  public void setStringCollectionValue(Collection<String> collectionValue) {
-    this.stringCollection = collectionValue;
+  public void setStringCollectionValue(Collection<String> stringCollectionValue) {
+    this.stringCollectionValue = stringCollectionValue;
   }
 
   @Override
   public Collection<String> getStringCollectionValue() {
-    return this.getStringCollectionValue();
+    return this.stringCollectionValue;
   }
 
   @Override
-  public void setNumberCollectionValue(Collection<Long> collectionValue) {
-    this.numberCollection = collectionValue;
+  public void setLongCollectionValue(Collection<Long> longCollectionValue) {
+    this.longCollectionValue = longCollectionValue;
   }
 
   @Override
-  public Collection<Long> getNumberCollectionValue() {
-    return this.numberCollection;
+  public Collection<Long> getLongCollectionValue() {
+    return this.longCollectionValue;
+  }
+
+  @Override
+  public void setDoubleCollectionValue(Collection<Double> doubleCollectionValue) {
+    this.doubleCollectionValue = doubleCollectionValue;
+  }
+
+  @Override
+  public Collection<Double> getDoubleCollectionValue() {
+    return this.doubleCollectionValue;
   }
 }

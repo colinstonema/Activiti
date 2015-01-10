@@ -12,6 +12,7 @@
  */
 package org.activiti.engine.impl.util;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,4 +61,14 @@ public class CollectionUtil {
     return map;
   }
   
+  public static Class<?> getContentClass(Collection collection) {
+    if(collection == null || collection.isEmpty()) {
+      return null;
+    }
+    Object obj =  collection.iterator().next();
+    if(obj == null) {
+      return null;
+    }
+    return obj.getClass();
+  }
 }
