@@ -299,7 +299,16 @@
     where ID_= #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
-  
+  <update id="programTimer" parameterType="org.activiti.engine.impl.persistence.entity.TimerEntity">
+    update ${prefix}ACT_RU_JOB
+    <set>
+       RETRIES_ = #{retries, jdbcType=INTEGER},
+       DUEDATE_ = #{duedate, jdbcType=TIMESTAMP}
+    </set>
+    where ID_= #{id, jdbcType=VARCHAR}
+      and REV_ = #{revision, jdbcType=INTEGER}
+  </update>
+
   <!-- TIMER SELECT -->
   
   <select id="selectUnlockedTimersByDuedate" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">

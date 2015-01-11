@@ -53,7 +53,16 @@ public class JobEntityManager extends AbstractManager {
     timer.insert();
     pokeJobExecutor(timer);
   }
-    
+
+  public void program(TimerEntity timer) {
+    Date duedate = timer.getDuedate();
+    if (duedate==null) {
+      throw new ActivitiIllegalArgumentException("duedate is null");
+    }
+    getDbSqlSession().update("programTimer", timer);
+    hintJobExecutor(timer);
+  }
+
   // Check if this timer is before the current process engine time
   public void pokeJobExecutor(JobEntity job) {
     if (job.getDuedate().getTime() <= (Context.getProcessEngineConfiguration().getClock().getCurrentTime().getTime())) {
